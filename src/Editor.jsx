@@ -75,6 +75,73 @@ export default function RichTextEditor() {
           height: 500,
           menubar: true,
           license_key: "gpl", // ✅ avoids license popup
+          setup: (editor) => {
+            const maxChars = 0;
+
+            // Setting  maximum character limit
+            editor.on("keydown", (e) => {
+              const text = editor.getContent({ format: "text" });
+              if (
+                maxChars > 0 &&
+                text.length >= maxChars &&
+                e.key.length === 1 &&
+                !e.ctrlKey &&
+                !e.metaKey
+              ) {
+                e.preventDefault();
+                alert(`Max ${maxChars} characters allowed!`);
+              }
+            });
+
+            // Showing character counts
+            editor.on("init", () => {
+              const statusbar = editor.getContainer().querySelector(".tox-statusbar");
+              if (statusbar) {
+                const charCountEl = document.createElement("div");
+                charCountEl.className = "tox-statusbar__charcount";
+                charCountEl.style.marginLeft = "15px";
+                charCountEl.style.marginRight = "10px";
+                charCountEl.style.fontSize = "14px";
+
+                // Get initial text length from editor’s content
+                const initialText = editor.getContent({ format: "text" });
+
+                if (maxChars > 0) {
+                  charCountEl.textContent = ` ${initialText.length}/${maxChars} characters`;
+                } else {
+                  charCountEl.textContent = ` ${initialText.length} characters`;
+                }
+
+                const wordcountEl = statusbar.querySelector(".tox-statusbar__wordcount");
+                if (wordcountEl && wordcountEl.parentNode) {
+                  wordcountEl.parentNode.insertBefore(charCountEl, wordcountEl.nextSibling);
+                } else {
+                  statusbar.appendChild(charCountEl);
+                }
+
+                // update on typing
+                editor.on("input", () => {
+                  const text = editor.getContent({ format: "text" });
+                  if (maxChars > 0) {
+                    charCountEl.textContent = ` ${text.length}/${maxChars} characters`;
+                  } else {
+                    charCountEl.textContent = ` ${text.length} characters`;
+                  }
+                });
+
+                editor.on("SetContent", () => {
+                  const text = editor.getContent({ format: "text" }) || "";
+                  if (charCountEl) {
+                    if (maxChars > 0) {
+                      charCountEl.textContent = ` ${text.length}/${maxChars} characters`;
+                    } else {
+                      charCountEl.textContent = ` ${text.length} characters`;
+                    }
+                  }
+                });
+              }
+            });
+          },
           plugins: [
             "advlist",
             "image",
