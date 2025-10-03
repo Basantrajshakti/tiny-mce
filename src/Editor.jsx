@@ -84,8 +84,8 @@ import "tinymce/plugins/table";
 import "tinymce/plugins/wordcount";
 // import "tinymce/plugins/help";
 
-import contentCss from "tinymce/skins/content/default/content.min.css";
-import contentUiCss from "tinymce/skins/ui/oxide/content.min.css";
+import contentCss from "tinymce/skins/content/default/content.min.css?inline";
+import contentUiCss from "tinymce/skins/ui/oxide/content.min.css?inline";
 
 export default function RichTextEditor() {
   const editorRef = useRef(null);
@@ -110,70 +110,78 @@ export default function RichTextEditor() {
   }, [content]);
 
   return (
-    <Editor
-      value={content} // controlled
-      onInit={(evt, editor) => (editorRef.current = editor)}
-      onEditorChange={(newContent) => setContent(newContent)}
-      init={{
-        skin: false,
-        content_css: false,
-        // content_style: "body { font-family: Helvetica, Arial, sans-serif; font-size:14px; }",
-        content_style: [contentCss, contentUiCss].join("\n"),
-        height: 500,
-        menubar: true,
-        license_key: "gpl", // ✅ avoids license popup
-        plugins: [
-          "advlist",
-          "image",
-          "charmap",
-          "preview",
-          "media",
-          // Text related only
-          "autolink",
-          "lists",
-          "link",
-          "anchor",
-          "searchreplace",
-          "visualblocks",
-          "code",
-          "fullscreen",
-          "insertdatetime",
-          "table",
-          "wordcount",
-        ],
-        // toolbar:
-        //   "undo redo | blocks | bold italic underline strikethrough forecolor backcolor | " +
-        //   "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | " +
-        //   "removeformat | link table  ",
-        toolbar:
-          "undo redo | blocks | bold italic underline strikethrough forecolor backcolor | " +
-          "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | " +
-          "removeformat | link image media table | code fullscreen preview  ",
-        branding: false,
-        // This enables file picker for images
-        file_picker_types: "image",
-        object_resizing: true,
-        file_picker_callback: (callback, value, meta) => {
-          if (meta.filetype === "image") {
-            const input = document.createElement("input");
-            input.setAttribute("type", "file");
-            input.setAttribute("accept", "image/*");
+    <>
+      <style>{`
+    .tox-promotion { 
+      display: none !important; 
+    }
+  `}</style>
 
-            input.onchange = function () {
-              const file = input.files[0];
-              const reader = new FileReader();
-              reader.onload = function () {
-                // Base64 encode image and return to TinyMCE
-                const base64 = reader.result;
-                callback(base64, { alt: file.name });
+      <Editor
+        value={content} // controlled
+        onInit={(evt, editor) => (editorRef.current = editor)}
+        onEditorChange={(newContent) => setContent(newContent)}
+        init={{
+          skin: false,
+          content_css: false,
+          // content_style: "body { font-family: Helvetica, Arial, sans-serif; font-size:14px; }",
+          content_style: [contentCss, contentUiCss].join("\n"),
+          height: 500,
+          menubar: true,
+          license_key: "gpl", // ✅ avoids license popup
+          plugins: [
+            "advlist",
+            "image",
+            "charmap",
+            "preview",
+            "media",
+            // Text related only
+            "autolink",
+            "lists",
+            "link",
+            "anchor",
+            "searchreplace",
+            "visualblocks",
+            "code",
+            "fullscreen",
+            "insertdatetime",
+            "table",
+            "wordcount",
+          ],
+          // toolbar:
+          //   "undo redo | blocks | bold italic underline strikethrough forecolor backcolor | " +
+          //   "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | " +
+          //   "removeformat | link table  ",
+          toolbar:
+            "undo redo | blocks | bold italic underline strikethrough forecolor backcolor | " +
+            "alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | " +
+            "removeformat | link image media table | code fullscreen preview  ",
+          branding: false,
+          // This enables file picker for images
+          file_picker_types: "image",
+          object_resizing: true,
+          file_picker_callback: (callback, value, meta) => {
+            if (meta.filetype === "image") {
+              const input = document.createElement("input");
+              input.setAttribute("type", "file");
+              input.setAttribute("accept", "image/*");
+
+              input.onchange = function () {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function () {
+                  // Base64 encode image and return to TinyMCE
+                  const base64 = reader.result;
+                  callback(base64, { alt: file.name });
+                };
+                reader.readAsDataURL(file);
               };
-              reader.readAsDataURL(file);
-            };
 
-            input.click();
-          }
-        },
-      }}
-    />
+              input.click();
+            }
+          },
+        }}
+      />
+    </>
   );
 }
