@@ -1,8 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 
-import "tinymce/skins/ui/oxide/skin.min.css";
-
 // Import TinyMCE core
 import "tinymce/tinymce";
 
@@ -32,6 +30,7 @@ import "tinymce/plugins/wordcount";
 
 import contentCss from "tinymce/skins/content/default/content.min.css?inline";
 import contentUiCss from "tinymce/skins/ui/oxide/content.min.css?inline";
+import "tinymce/skins/ui/oxide/skin.min.css";
 
 export default function RichTextEditor() {
   const editorRef = useRef(null);
